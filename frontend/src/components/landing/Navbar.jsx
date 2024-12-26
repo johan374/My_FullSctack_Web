@@ -39,7 +39,7 @@ function Navbar() {
         This unordered list (`ul`) contains links for desktop view.
         - `hidden md:flex`: The menu is hidden on small screens (below `md`) and visible as a flexbox on medium (`md`) screens and larger.
       */}
-     <ul className="flex uppercase p-4">
+     <ul className="hidden md:flex uppercase p-4">
             <li className="p-4">
                 <Link to="/dashboard" className="hover:text-[#00df9a] transition-colors duration-300">Home</Link>
             </li>
