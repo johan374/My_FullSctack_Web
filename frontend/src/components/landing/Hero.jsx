@@ -19,14 +19,14 @@ function Hero() {
         </p>
 
         {/* Main heading with responsive font sizes for different screen sizes */}
-        <h1 className="md:text-7xl sm:text-6xl text-4xl font-bold">
+        <h1 className="md:text-7xl sm:text-5xl text-3xl font-bold">
           Grow with data..
         </h1>
 
         {/* Container for the subheading and typing animation */}
         <div className="flex justify-center items-center">
           {/* Static text for the subheading */}
-          <p className="md:text-5xl sm:text-4xl text-xl font-bold py-4">
+          <p className="md:text-2xl text-xl font-bold text-gray-500 py-4">
             Fast, flexible financing for
           </p>
 

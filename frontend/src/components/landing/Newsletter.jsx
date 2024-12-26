@@ -95,7 +95,7 @@ return (
           {/* Form section */}
           <div className="my-4">
               {/* Flex container that changes direction based on screen size */}
-              <div className="flex flex-col sm:flex-row items-center justify-between w-full">
+              <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
                   {/* Input container */}
                   <div className="relative w-full">
                       {/* Email input field */}
@@ -121,8 +121,8 @@ return (
                       onClick={handleSubmit} // Handle form submission
                       disabled={loading || !email} // Disable when loading or no email
                       className={`
-                          bg-[#00df9a] w-[200px] rounded-md font-medium 
-                          my-6 mx-auto py-3 text-black 
+                          bg-[#00df9a]  w-full sm:w-[200px] rounded-md font-medium 
+                          my-2 sm:my-6" py-3 text-black 
                           transition-all duration-300
                           hover:bg-blue-400 hover:scale-105
                           disabled:opacity-50 disabled:cursor-not-allowed
