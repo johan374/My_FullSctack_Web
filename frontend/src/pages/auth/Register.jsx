@@ -46,39 +46,80 @@ function Register() {
     // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
+<<<<<<< HEAD
         
         // Prevent submission if already loading
+=======
+        console.log("Form submitted"); // Debug log
+
+>>>>>>> 64c79861667e7f1f262993f3df8d3f520e0d3b8a
         if (loading) return;
         
+        if (!validateForm()) {
+            return;
+        }
+
         try {
             setLoading(true);
             setError("");
+<<<<<<< HEAD
     
             if (!validateForm()) {
                 setLoading(false);  // Don't forget to reset loading if validation fails
                 return;
             }
     
+=======
+
+            console.log("Sending registration request with:", { username, email }); // Debug log
+
+>>>>>>> 64c79861667e7f1f262993f3df8d3f520e0d3b8a
             const response = await api.post("/api/user/register/", {
                 username,
                 email,
                 password,
                 confirm_password: confirmPassword
             });
+<<<<<<< HEAD
     
             console.log('Registration response:', response);
     
             // Check for successful response (200 or 201)
             if (response.status === 201) {
                 alert("Registration successful! Please login.");
+=======
+
+            console.log("Registration response:", response); // Debug log
+
+            if (response.status === 201) {
+                console.log("Registration successful");
+                toast.success("Registration successful! Please login.");
+>>>>>>> 64c79861667e7f1f262993f3df8d3f520e0d3b8a
                 navigate("/login");
-                return;
             }
     
         } catch (error) {
+<<<<<<< HEAD
             console.error("Registration error:", error.response);
             
             let errorMessage = "";
+=======
+            console.error("Full error object:", error); // Debug log
+            console.error("Error response data:", error.response?.data); // Debug log
+
+            // Handle backend validation errors
+            if (error.response?.data?.error) {
+                setError(error.response.data.error);
+            } else if (error.response?.status === 409) {
+                setError("Username or email already exists");
+            } else {
+                setError("Registration failed. Please try again.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+>>>>>>> 64c79861667e7f1f262993f3df8d3f520e0d3b8a
     
             // First check for specific error messages from backend
             if (error.response?.data?.error) {
