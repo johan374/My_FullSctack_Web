@@ -31,6 +31,8 @@ postgres_data/
 
 # Personal notes
 notes.txt
+note.txt
+structure.txt
 
 # Docker
 .docker/

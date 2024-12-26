@@ -56,7 +56,7 @@ const SuccessPage = () => {
                     - hover effects for interactivity
                 */}
                 <Link 
-                    to="/"
+                    to="/dashboard"
                     className="inline-block bg-[#00df9a] text-white px-6 py-3 rounded-md font-medium hover:bg-[#00c589] transition-colors duration-300"
                 >
                     Return Home

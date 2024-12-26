@@ -1,8 +1,8 @@
 // Import required dependencies
 import { Navigate } from "react-router-dom"; // Used for programmatic navigation in React Router
 import { jwtDecode } from "jwt-decode"; // Library to decode JWT (JSON Web Tokens)
-import api from "../utils/api"; // Custom API service/instance for making HTTP requests
-import { REFRESH_TOKEN, ACCESS_TOKEN } from "../utils/constants"; // Constants storing token key names
+import api from "../../utils/api"; // Custom API service/instance for making HTTP requests
+import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../utils/constants"; // Constants storing token key names
 import { useState, useEffect } from "react"; // React hooks for state management and side effects
 
 // ProtectedRoute component definition

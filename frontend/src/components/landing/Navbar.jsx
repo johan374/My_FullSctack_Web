@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 // Import specific icons (AiOutlineClose and AiOutlineMenu) from the 'react-icons' library.
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
 
 // Define the Navbar component as a functional component.
 function Navbar() {
@@ -38,14 +39,23 @@ function Navbar() {
         This unordered list (`ul`) contains links for desktop view.
         - `hidden md:flex`: The menu is hidden on small screens (below `md`) and visible as a flexbox on medium (`md`) screens and larger.
       */}
-      <ul className="hidden md:flex">
-        <li className="p-4">Home</li> {/* Each `li` is a menu link with padding for spacing. */}
-        <li className="p-4">Company</li>
-        <li className="p-4">Resources</li>
-        <li className="p-4">Contact</li>
-        <li className="p-4">About</li>
-      </ul>
-
+     <ul className="flex uppercase p-4">
+            <li className="p-4">
+                <Link to="/dashboard" className="hover:text-[#00df9a] transition-colors duration-300">Home</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Company</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Resources</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Contact</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">About</Link>
+            </li>
+        </ul>
       {/* Hamburger Menu Icon for Mobile */}
       {/* 
         A clickable icon displayed only on small screens (`block md:hidden`).
@@ -84,12 +94,23 @@ function Navbar() {
           - Each link (`li`) has padding for spacing and a bottom border for separation.
           - `uppercase` transforms text to uppercase.
         */}
-        <ul className="p-4 uppercase">
-          <li className="p-4 border-b border-gray-600">Home</li>
-          <li className="p-4 border-b border-gray-600">Company</li>
-          <li className="p-4 border-b border-gray-600">Resources</li>
-          <li className="p-4 border-b border-gray-600">Contact</li>
-          <li className="p-4 border-b border-gray-600">About</li>
+        {/* Desktop Navigation Menu */}
+        <ul className="uppercase p-4">
+            <li className="p-4">
+                <Link to="/dashboard" className="hover:text-[#00df9a] transition-colors duration-300">Home</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Company</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Resources</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">Contact</Link>
+            </li>
+            <li className="p-4">
+                <Link to="/" className="hover:text-[#00df9a] transition-colors duration-300">About</Link>
+            </li>
         </ul>
       </div>
     </div>

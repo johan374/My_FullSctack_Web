@@ -15,5 +15,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true
+  },
+  // Add this object for SPA routing
+  preview: {
+    port: 5173,
+    strictPort: true,
+    host: true,
+    headers: {
+      "Cache-Control": "no-store"
+    }
   }
 })

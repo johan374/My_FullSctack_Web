@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 // Importing social media icons from react-icons
 // Note: FaGithubSquare is the correct import (not FaGitSquare as in previous version)
 import {
@@ -49,10 +50,18 @@ const Footer = () => {
         <div>
             <h6 className='font-medium text-gray-400'>Solutions</h6>
             <ul>
-                <li className='py-2 text-sm'>Analytics</li>
-                <li className='py-2 text-sm'>Marketing</li>
-                <li className='py-2 text-sm'>Commerce</li>
-                <li className='py-2 text-sm'>Insights</li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Analytics</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Marketing</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Commerce</Link>
+                  </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Insights</Link>
+                </li>
             </ul>
         </div>
 
@@ -60,9 +69,15 @@ const Footer = () => {
         <div>
             <h6 className='font-medium text-gray-400'>Support</h6>
             <ul>
-                <li className='py-2 text-sm'>Pricing</li>
-                <li className='py-2 text-sm'>Documentation</li>
-                <li className='py-2 text-sm'>Guides</li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Pricing</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Documentation</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Guides</Link>
+                </li>
                 <li className='py-2 text-sm'>API Status</li>
             </ul>
         </div>
@@ -71,11 +86,21 @@ const Footer = () => {
         <div>
             <h6 className='font-medium text-gray-400'>Company</h6>
             <ul>
-                <li className='py-2 text-sm'>About</li>
-                <li className='py-2 text-sm'>Blog</li>
-                <li className='py-2 text-sm'>Jobs</li>
-                <li className='py-2 text-sm'>Press</li>
-                <li className='py-2 text-sm'>Careers</li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'> About</Link> 
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Blog</Link> 
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Jobs</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Press</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Careers</Link>
+                </li>
             </ul>
         </div>
 
@@ -83,9 +108,15 @@ const Footer = () => {
         <div>
             <h6 className='font-medium text-gray-400'>Legal</h6>
             <ul>
-                <li className='py-2 text-sm'>Claim</li>
-                <li className='py-2 text-sm'>Policy</li>
-                <li className='py-2 text-sm'>Terms</li>
+                <li className='py-2 text-sm'>
+                  <Link to="/" className='hover:text-[#00df9a] transition-colors duration-300'>Claim</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/privacy" className='hover:text-[#00df9a] transition-colors duration-300'>Policy</Link>
+                </li>
+                <li className='py-2 text-sm'>
+                  <Link to="/terms" className='hover:text-[#00df9a] transition-colors duration-300'>Terms</Link>
+                </li>
             </ul>
         </div>
       </div>

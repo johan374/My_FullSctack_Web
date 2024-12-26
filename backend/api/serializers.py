@@ -6,27 +6,24 @@ from .models import Note
 # Define a custom serializer class for the User model
 # Inheriting from `serializers.ModelSerializer` to automatically generate a serializer for the User model
 class UserSerializer(serializers.ModelSerializer):
+    # Explicitly define confirm_password field since it's not in User model
+    confirm_password = serializers.CharField(write_only=True, required=True)
     
-    # Define metadata for the serializer
-    # The `Meta` class defines some important settings for the serializer
     class Meta:
-        model = User  # This tells the serializer which model to serialize (in this case, the `User` model).
-        fields = ["id", "username", "email", "password"]  # The fields to be serialized: id, username, and password
-        # The `extra_kwargs` is used to define special handling for certain fields
-        # For example, we want the password field to be "write-only" (it will not be returned in API responses)
-        extra_kwargs = {"password": {"write_only": True},
-                        "email": {"required": True}
-                        }
+        model = User
+        fields = ["id", "username", "email", "password", "confirm_password"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "email": {"required": True}
+        }
 
-    # Custom create method to handle user creation securely
-    def create(self, validated_data):
-        try:
-            user = User.objects.create_user(**validated_data)
-            print(f"User created: {user.username}")
-            return user
-        except Exception as e:
-            print(f"User creation error: {e}")
-            raise serializers.ValidationError(str(e))
+    def validate(self, data):
+        """
+        Check that the passwords match
+        """
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match"})
+        return data
 
     def validate_username(self, value):
         """
@@ -35,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("A user with that username already exists.")
         return value
-    
+
     def validate_email(self, value):
         """
         Check if email already exists
@@ -43,7 +40,25 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with that email already exists.")
         return value
-            
+
+    def create(self, validated_data):
+        """
+        Create and return a new user instance
+        """
+        # Remove confirm_password from the data as it's not needed for user creation
+        validated_data.pop('confirm_password', None)
+        
+        try:
+            user = User.objects.create_user(
+                username=validated_data['username'],
+                email=validated_data['email'],
+                password=validated_data['password']
+            )
+            return user
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+
+
     
 # Define the NoteSerializer class that will serialize the Note model
 class NoteSerializer(serializers.ModelSerializer):

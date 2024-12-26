@@ -2,15 +2,18 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Auth pages
-import Login from "./pages/Login";
-import Register from './pages/Register';
-import Home from './pages/Home';
-import NotFound from './pages/NotFound';
-import ProtectedRoute from './components/ProtectedRoute';
-import LandingPage from './pages/LandingPage';
-// Add these imports
-import PaymentPage from './components/PaymentPage';
-import SuccessPage from './components/SuccessPage';
+import Login from "./pages/auth/Login.jsx";
+import Register from './pages/auth/Register.jsx';
+import Home from './pages/Home.jsx';
+import NotFound from './pages/NotFound.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+//other imports
+import LandingPage from './pages/LandingPage.jsx';
+import PaymentPage from './components/payment/PaymentPage.jsx';
+import SuccessPage from './components/payment/SuccessPage.jsx';
+import { ForgotPassword, ResetPassword } from './components/auth/ForgotPassword.jsx';
+import Privacy from './components/legal/Privacy.jsx';
+import Terms from './components/legal/Terms.jsx';
 
 // Logout functionality
 function Logout() {
@@ -66,6 +69,11 @@ const AppRoutes = () => {
         }
       />
 
+      <Route path='/forgot-password' element={<ForgotPassword />} />
+      <Route path='/reset-password/:uid/:token' element={<ResetPassword />} />
+
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
     </Routes>
   );
 };

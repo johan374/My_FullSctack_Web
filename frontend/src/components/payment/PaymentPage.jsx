@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import api from '../utils/api';
+import api from '../../utils/api';
 
 // PaymentForm component takes planType and amount as props from parent
 const PaymentForm = ({ planType, amount }) => {

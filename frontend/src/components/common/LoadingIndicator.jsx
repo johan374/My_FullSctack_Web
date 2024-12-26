@@ -1,5 +1,5 @@
 // Import the CSS file for styling the loading indicator
-import "../styles/LoadingIndicator.css";
+import "../../styles/components/LoadingIndicator.css";
 
 /*
  * LoadingIndicator Component

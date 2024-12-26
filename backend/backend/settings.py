@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b0j7wk+lfjt+n9u)8!oqm4(bcf_+xsv!mmrznxp5x=zeyv#_-9'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +39,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'my-fullsctack-web.onrender.com',
     'my-fullsctack-web-frontend.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0'
 ] #new featuree *
 
 #new code
@@ -66,6 +69,8 @@ SIMPLE_JWT = {
     # This token is used to obtain new access tokens when they expire.
     # It remains valid for 1 day, allowing clients to reauthenticate without providing their credentials again.
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
 }
 #end of new code
 
@@ -83,6 +88,8 @@ INSTALLED_APPS = [
     # Custom app for the project
     "api",                           # Your custom app where API-related functionality is implemented.
     'payments',
+    'password_management',
+    'SendEmail',
 
     # Third-party libraries for added functionality
     "rest_framework",                # Django REST Framework for building and managing APIs.
@@ -137,17 +144,31 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Configure database using dj_database_url
 # Import the library that helps us parse database URLs
-import dj_database_url
+from dotenv import load_dotenv  # Import to read .env file
+import os
 
+# Load all environment variables from .env file
+# This makes them available through os.getenv()
+load_dotenv()
+
+# Database configuration using environment variables
 DATABASES = {
-    'default': dj_database_url.config(
-        # Get the DATABASE_URL from environment variables (the one we set in Render)
-        default=os.getenv('DATABASE_URL'),
-        # Keep the database connection alive for 600 seconds (10 minutes)
-        # This helps performance by reusing connections
-        conn_max_age=600
-    )
+    'default': {
+        # Specify PostgreSQL as the database engine
+        'ENGINE': 'django.db.backends.postgresql',
+        # Get database name from .env, fallback to 'my_db' if not found
+        'NAME': os.getenv('DB_NAME', 'my_db'),       
+        # Get database user from .env
+        'USER': os.getenv('DB_USER'),    
+        # Get database password from .env
+        'PASSWORD': os.getenv('DB_PASSWORD'), 
+        # Get host from .env (localhost for local development)
+        'HOST': os.getenv('DB_HOST'),
+        # Get port from .env (default PostgreSQL port is 5432)
+        'PORT': os.getenv('DB_PORT'),
+    }
 }
+
 
 
 # Password validation
@@ -202,11 +223,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Allowing all origins (domains) to make cross-origin requests to the API
-CORS_ALLOW_ALL_ORIGINS = True   # This allows any domain to access your API, which is useful in development but should be restricted in production to ensure security.
+#CORS_ALLOW_ALL_ORIGINS = True   # This allows any domain to access your API, which is useful in development but should be restricted in production to ensure security.
 
 CORS_ALLOWED_ORIGINS = [
-    "my-fullsctack-web-frontend.onrender.com",  # Replace with your frontend URL
+    "https://my-fullsctack-web-frontend.onrender.com",  # Replace with your frontend URL
+    "http://localhost:5173",
 ]
 
 # Allowing credentials (cookies, HTTP authentication, etc.) to be included in cross-origin requests
-CORS_ALLOW_ALL_CREDENTIALS = True   # This allows requests to include credentials (e.g., cookies, HTTP authentication), which can be necessary for maintaining user sessions across different domains.
+CORS_ALLOW_CREDENTIALS = True   # This allows requests to include credentials (e.g., cookies, HTTP authentication), which can be necessary for maintaining user sessions across different domains.
+
+# Email settings (configure according to your email provider)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'robloxmapa@gmail.com'
+EMAIL_HOST_PASSWORD = 'xjsv xeyd uffk ahxr' #important
+DEFAULT_FROM_EMAIL = 'robloxmapa@gmail.com'
+
+# Frontend URL for password reset
+FRONTEND_URL = 'http://localhost:5173'  # Adjust to your frontend URL

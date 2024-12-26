@@ -1,8 +1,4 @@
-I'll help you update these files to match our new environment structure:
-
-Updated docker-compose.yml:
-
-yamlCopyservices:
+services:
   # Backend service (Python/Django)
   web:
     image: python:3.9
