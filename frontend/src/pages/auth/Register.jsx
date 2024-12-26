@@ -43,71 +43,76 @@ function Register() {
     // Get the navigate function for redirecting users
     const navigate = useNavigate();
 
+    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Early return if already loading
+        // Prevent submission if already loading
         if (loading) return;
         
         try {
             setLoading(true);
             setError("");
     
-            // Validate form before proceeding
-            const validationError = validateForm();
-            if (validationError) {
-                setError(validationError);
+            if (!validateForm()) {
+                setLoading(false);  // Don't forget to reset loading if validation fails
                 return;
             }
     
-            // Prepare request payload
-            const payload = {
+            const response = await api.post("/api/user/register/", {
                 username,
                 email,
                 password,
                 confirm_password: confirmPassword
-            };
+            });
     
-            const response = await api.post("/api/user/register/", payload);
+            console.log('Registration response:', response);
     
-            // Success case
-            if (response.status >= 200 && response.status < 300) {
-                toast.success("Registration successful! Please login.");
+            // Check for successful response (200 or 201)
+            if (response.status === 201) {
+                alert("Registration successful! Please login.");
                 navigate("/login");
                 return;
             }
+    
         } catch (error) {
             console.error("Registration error:", error.response);
             
-            // Handle specific error cases
-            const errorMap = {
-                'username already exists': "Username already exists",
-                'email already exists': "Email already exists"
-            };
+            let errorMessage = "";
     
-            // Check for known error messages
-            const knownError = error.response?.data?.error;
-            if (knownError) {
-                for (const [key, message] of Object.entries(errorMap)) {
-                    if (knownError.includes(key)) {
-                        setError(message);
-                        return;
-                    }
+            // First check for specific error messages from backend
+            if (error.response?.data?.error) {
+                const errorText = error.response.data.error;
+                if (errorText.includes('username already exists')) {
+                    errorMessage = "Username already exists";
+                } else if (errorText.includes('email already exists')) {
+                    errorMessage = "Email already exists";
+                } else {
+                    // Use the error message from the backend
+                    errorMessage = errorText;
+                }
+            } else {
+                // If no specific error message, handle by status code
+                switch (error.response?.status) {
+                    case 429:
+                        errorMessage = "Too many attempts. Please try again later";
+                        break;
+                    case 500:
+                        errorMessage = "Server error. Please try again later";
+                        break;
+                    case 400:
+                        errorMessage = "Invalid input. Please check your details.";
+                        break;
+                    case 409:
+                        errorMessage = "Username or email already exists";
+                        break;
+                    default:
+                        errorMessage = "Registration failed. Please try again";
                 }
             }
-    
-            // Handle different HTTP status codes
-            const statusMessages = {
-                400: "Invalid input. Please check your details.",
-                409: "Username or email already exists",
-                429: "Too many attempts. Please try again later",
-                500: "Server error. Please try again later"
-            };
-    
-            const statusError = statusMessages[error.response?.status] || 
-                              "Registration failed. Please try again";
             
-            setError(statusError);
+            setError(errorMessage);
+            
         } finally {
             setLoading(false);
         }
