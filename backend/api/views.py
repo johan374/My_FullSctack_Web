@@ -115,10 +115,32 @@ def current_user(request):
 
 
 class CreateUserView(generics.CreateAPIView):
-    """Handle user registration"""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            # Attempt to create user via parent class method
+            response = super().create(request, *args, **kwargs)
+            # Return 201 status on success
+            return Response(response.data, status=status.HTTP_201_CREATED)
+            
+        except serializers.ValidationError as e:
+            # Handle validation errors (like invalid password)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            # Check error message for specific cases
+            if "username already exists" in str(e).lower():
+                return Response({"error": "Username already exists"}, 
+                            status=status.HTTP_409_CONFLICT)
+            if "email already exists" in str(e).lower():
+                return Response({"error": "Email already exists"}, 
+                            status=status.HTTP_409_CONFLICT)
+            # Generic server error for other exceptions    
+            return Response({"error": "Server error"}, 
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Note Management Views
