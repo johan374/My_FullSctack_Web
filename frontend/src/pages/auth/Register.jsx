@@ -65,7 +65,7 @@ function Register() {
     };
     
     // Enhanced handleSubmit function
-    onst handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (loading) return;
