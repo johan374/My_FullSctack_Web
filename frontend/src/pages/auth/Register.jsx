@@ -65,7 +65,7 @@ function Register() {
     };
     
     // Enhanced handleSubmit function
-    const handleSubmit = async (e) => {
+    onst handleSubmit = async (e) => {
         e.preventDefault();
         
         if (loading) return;
@@ -83,6 +83,13 @@ function Register() {
                 return;
             }
     
+            console.log('Submitting registration with data:', {
+                username,
+                email,
+                password,
+                confirm_password: confirmPassword
+            });
+    
             const response = await api.post("/api/user/register/", {
                 username,
                 email,
@@ -99,34 +106,31 @@ function Register() {
             }
     
         } catch (error) {
-            console.error("Full registration error:", error);
-            console.error("Error response:", error.response);
-            console.error("Error data:", error.response?.data);
-            console.error("Error status:", error.response?.status);
+            console.error("Full error object:", error);
+            console.error("Error name:", error.name);
+            console.error("Error message:", error.message);
             
             if (error.response) {
-                const errorData = error.response.data;
-                console.log("Detailed error data:", errorData);
-        
-                // More flexible error handling
-                if (errorData.error) {
-                    if (errorData.error.toLowerCase().includes('username')) {
-                        setUsernameError(errorData.details ? errorData.details[0] : "Username already exists");
-                    } else if (errorData.error.toLowerCase().includes('email')) {
-                        setEmailError(errorData.details ? errorData.details[0] : "Email already exists");
-                    } else {
-                        setError(errorData.error);
-                    }
+                console.error("Response data:", error.response.data);
+                console.error("Response status:", error.response.status);
+                console.error("Response headers:", error.response.headers);
+            }
+            
+            // More detailed error handling
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    setError(error.response.data.error || "Registration failed");
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    setError("No response from server. Check your network connection.");
                 } else {
-                    // Fallback error message
-                    setError("Registration failed. Please try again");
+                    // Something happened in setting up the request
+                    setError(`Error: ${error.message}`);
                 }
-            } else if (error.request) {
-                // The request was made but no response was received
-                setError("No response from server. Please check your network connection.");
             } else {
-                // Something happened in setting up the request
-                setError("Error setting up the registration request");
+                // Handle non-axios errors
+                setError(`Unexpected error: ${error.message}`);
             }
         } finally {
             setLoading(false);
