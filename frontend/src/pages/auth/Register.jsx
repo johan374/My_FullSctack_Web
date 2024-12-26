@@ -24,6 +24,27 @@ function Register() {
             setLoading(false);                   // Disable loading state       
             return false;                        // Stop form submission
         }
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters");
+            return false;
+        }
+        if (username.length < 3) {
+            setError("Username must be at least 3 characters");
+            return false;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError("Invalid email format");
+            return false;
+        }
+        // Handle backend error responses
+        if (error.response?.data?.error?.includes('username already exists')) {
+            setError("Username already exists");
+            return false;
+        }
+        if (error.response?.data?.error?.includes('email already exists')) {
+            setError("Email already exists"); 
+            return false;
+        }
         return true;   
     };
 
