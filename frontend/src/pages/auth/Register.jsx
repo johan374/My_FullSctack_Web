@@ -96,45 +96,42 @@ function Register() {
             }
     
         } catch (error) {
-            console.error("Registration error:", error.response);
+            console.error("Full registration error:", error);
+            console.error("Error response:", error.response);
+            console.error("Error data:", error.response?.data);
+            console.error("Error status:", error.response?.status);
             
-            // Handle specific backend validations
-            const errorData = error.response?.data?.error;
-            
-            if (errorData) {
-                if (typeof errorData === 'string') {
-                    // Handle string error messages
-                    if (errorData.includes('username already exists')) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                const errorData = error.response.data;
+                
+                console.log("Detailed error data:", errorData);
+        
+                // Check for specific error scenarios
+                if (errorData.error) {
+                    if (errorData.error.includes('username already exists')) {
                         setUsernameError("This username is already taken");
-                    } else if (errorData.includes('email already exists')) {
+                    } else if (errorData.error.includes('email already exists')) {
                         setEmailError("An account with this email already exists");
                     } else {
-                        setError(errorData);
+                        setError(errorData.error);
                     }
-                } else if (typeof errorData === 'object') {
-                    // Handle object error messages
-                    if (errorData.username) setUsernameError(errorData.username[0]);
-                    if (errorData.email) setEmailError(errorData.email[0]);
-                    if (errorData.password) setPasswordError(errorData.password[0]);
+                } else {
+                    // Fallback error message
+                    setError("Registration failed. Please try again");
                 }
+            } else if (error.request) {
+                // The request was made but no response was received
+                setError("No response from server. Please check your network connection.");
             } else {
-                // Handle HTTP status code errors
-                switch (error.response?.status) {
-                    case 429:
-                        setError("Too many attempts. Please try again later");
-                        break;
-                    case 500:
-                        setError("Server error. Please try again later");
-                        break;
-                    default:
-                        setError("Registration failed. Please try again");
-                }
+                // Something happened in setting up the request
+                setError("Error setting up the registration request");
             }
         } finally {
             setLoading(false);
         }
+    
     };
-
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>Register</h1>

@@ -121,35 +121,45 @@ class CreateUserView(generics.CreateAPIView):
    permission_classes = [AllowAny]  # Allow unauthenticated access
 
    def create(self, request, *args, **kwargs):
-       try:
-           # Attempt to create user
-           response = super().create(request, *args, **kwargs)
-           return Response(response.data, status=status.HTTP_201_CREATED)
+        try:
+            response = super().create(request, *args, **kwargs)
+            return Response(response.data, status=status.HTTP_201_CREATED)
 
-       except serializers.ValidationError as e:
-           # Handle validation errors
-           error_data = e.detail if hasattr(e, 'detail') else e.args[0]
+        except serializers.ValidationError as e:
+            error_data = e.detail if hasattr(e, 'detail') else e.args[0]
 
-           if isinstance(error_data, dict):
-               # Check specific validation errors
-               if 'username' in error_data:
-                   return Response({"error": "Username already exists"}, 
-                                status=status.HTTP_409_CONFLICT)
-               if 'email' in error_data:
-                   return Response({"error": "Email already exists"}, 
-                                status=status.HTTP_409_CONFLICT)
-               if 'password' in error_data:
-                   return Response({"error": error_data['password'][0]}, 
-                                status=status.HTTP_400_BAD_REQUEST)
+            # More detailed error logging
+            print("Validation Error:", error_data)
 
-           # Generic validation error
-           return Response({"error": str(error_data)}, 
-                         status=status.HTTP_400_BAD_REQUEST)
+            # Specific error handling
+            if isinstance(error_data, dict):
+                if 'username' in error_data:
+                    return Response(
+                        {"error": "Username already exists", "details": error_data['username']}, 
+                        status=status.HTTP_409_CONFLICT
+                    )
+                if 'email' in error_data:
+                    return Response(
+                        {"error": "Email already exists", "details": error_data['email']}, 
+                        status=status.HTTP_409_CONFLICT
+                    )
+                if 'password' in error_data:
+                    return Response(
+                        {"error": error_data['password'][0]}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
-       except Exception as e:
-           # Handle unexpected errors
-           return Response({"error": "Server error occurred"}, 
-                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": str(error_data)}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # Log the full exception for server-side debugging
+            print("Unexpected error during user creation:", str(e))
+            return Response(
+                {"error": "Server error occurred", "details": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
 
 # Note Management Views
 class NoteListCreate(generics.ListCreateAPIView):
