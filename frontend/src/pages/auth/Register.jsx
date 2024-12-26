@@ -43,82 +43,74 @@ function Register() {
     // Get the navigate function for redirecting users
     const navigate = useNavigate();
 
-    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError("");
-    
-        if (!validateForm()) {
-            return;
-        }
-    
+        
+        // Early return if already loading
+        if (loading) return;
+        
         try {
-            const response = await api.post("/api/user/register/", {
+            setLoading(true);
+            setError("");
+    
+            // Validate form before proceeding
+            const validationError = validateForm();
+            if (validationError) {
+                setError(validationError);
+                return;
+            }
+    
+            // Prepare request payload
+            const payload = {
                 username,
                 email,
                 password,
                 confirm_password: confirmPassword
-            });
+            };
     
-            console.log('Registration response:', response); // For debugging
+            const response = await api.post("/api/user/register/", payload);
     
-            // Any successful response (200 or 201) should be treated as success
+            // Success case
             if (response.status >= 200 && response.status < 300) {
-                alert("Registration successful! Please login.");
+                toast.success("Registration successful! Please login.");
                 navigate("/login");
                 return;
             }
-    
         } catch (error) {
-            // Log full error response for debugging
             console.error("Registration error:", error.response);
-
-             // Handle backend error responses
-            if (error.response?.data?.error?.includes('username already exists')) {
-                setError("Username already exists");
-                return false;
-            }
-            if (error.response?.data?.error?.includes('email already exists')) {
-                setError("Email already exists"); 
-                return false;
-            } else {
-                switch (error.response?.status) {
-                    // ... rest of your cases
+            
+            // Handle specific error cases
+            const errorMap = {
+                'username already exists': "Username already exists",
+                'email already exists': "Email already exists"
+            };
+    
+            // Check for known error messages
+            const knownError = error.response?.data?.error;
+            if (knownError) {
+                for (const [key, message] of Object.entries(errorMap)) {
+                    if (knownError.includes(key)) {
+                        setError(message);
+                        return;
+                    }
                 }
             }
+    
+            // Handle different HTTP status codes
+            const statusMessages = {
+                400: "Invalid input. Please check your details.",
+                409: "Username or email already exists",
+                429: "Too many attempts. Please try again later",
+                500: "Server error. Please try again later"
+            };
+    
+            const statusError = statusMessages[error.response?.status] || 
+                              "Registration failed. Please try again";
             
-            // Initialize error message variable
-            let errorMessage;
-         
-            // Check error status code and set appropriate message
-            switch (error.response?.status) {
-                case 429: 
-                    // Rate limit exceeded
-                    errorMessage = "Too many attempts. Please try again later";
-                    break;
-                case 500:
-                    // Server-side error
-                    errorMessage = "Server error. Please try again later";
-                    break;
-                case 400:
-                    // Validation/bad request error
-                    errorMessage = "Invalid input. Please check your details.";
-                    break;
-                case 409:
-                    // Conflict - duplicate resource
-                    errorMessage = "Username or email already exists";
-                    break;
-                default:
-                    // Generic error for unknown cases
-                    errorMessage = "Registration failed. Please try again";
-            }
-            // Set error state to display to user
-            setError(errorMessage);
-         } finally {
-            // Always reset loading state
+            setError(statusError);
+        } finally {
             setLoading(false);
-         }
+        }
     };
 
     return (
