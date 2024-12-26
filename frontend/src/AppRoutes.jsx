@@ -12,8 +12,8 @@ import LandingPage from './pages/LandingPage.jsx';
 import PaymentPage from './components/payment/PaymentPage.jsx';
 import SuccessPage from './components/payment/SuccessPage.jsx';
 import { ForgotPassword, ResetPassword } from './components/auth/ForgotPassword.jsx';
-import Privacy from './components/legal/Privacy.jsx';
-import Terms from './components/legal/Terms.jsx';
+import Privacy from './components/legal/privacy.jsx';
+import Terms from './components/legal/terms.jsx';
 
 // Logout functionality
 function Logout() {

@@ -5,7 +5,7 @@ const importImage = (imageName) => {
         // Convert the image name to lowercase and remove spaces
         const formattedName = imageName.toLowerCase().replace(/\s+/g, '_');
         // Return the dynamic path to the image
-        new URL(`../assets/${formattedName}.png`, import.meta.url).href
+        return new URL(`../assets/${formattedName}.png`, import.meta.url).href;
         // This will correctly resolve to the full path of your image
 
         // Without import.meta.url, relative paths might break when your code is bundled
