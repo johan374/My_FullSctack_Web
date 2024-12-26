@@ -47,6 +47,9 @@ function Register() {
         } else if (!/[A-Z]/.test(password)) {
             setPasswordError("Password must contain at least one uppercase letter");
             isValid = false;
+        } else if (!/[a-z]/.test(password)) {
+            setPasswordError("Password must contain at least one lowercase letter");
+            isValid = false;
         } else if (!/[0-9]/.test(password)) {
             setPasswordError("Password must contain at least one number");
             isValid = false;
@@ -129,7 +132,7 @@ function Register() {
             setLoading(false);
         }
     };
-    
+
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>Register</h1>
