@@ -36,17 +36,21 @@ function Register() {
             setError("Invalid email format");
             return false;
         }
-        // Handle backend error responses
-        if (error.response?.data?.error?.includes('username already exists')) {
-            setError("Username already exists");
-            return false;
-        }
-        if (error.response?.data?.error?.includes('email already exists')) {
-            setError("Email already exists"); 
-            return false;
-        }
         return true;   
     };
+
+     // Handle backend error responses
+     if (error.response?.data?.error?.includes('username already exists')) {
+        setError("Username already exists");
+        return false;
+    }
+    if (error.response?.data?.error?.includes('email already exists')) {
+        setError("Email already exists"); 
+        return false;
+    } else {
+        switch (error.response?.status) {
+            // ... rest of your cases
+        }
 
 
     // Get the navigate function for redirecting users
