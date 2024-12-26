@@ -51,7 +51,7 @@ function Register() {
         switch (error.response?.status) {
             // ... rest of your cases
         }
-
+    }
 
     // Get the navigate function for redirecting users
     const navigate = useNavigate();
