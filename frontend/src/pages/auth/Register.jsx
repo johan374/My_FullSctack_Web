@@ -17,92 +17,116 @@ function Register() {
     const navigate = useNavigate();
 
     const validateForm = () => {
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return false;
-        }
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters");
-            return false;
-        }
+        // Reset all error states
+        setUsernameError("");
+        setEmailError("");
+        setPasswordError("");
+        setError("");
+    
+        let isValid = true;
+    
+        // Username validation
         if (username.length < 3) {
-            setError("Username must be at least 3 characters");
-            return false;
+            setUsernameError("Username must be at least 3 characters");
+            isValid = false;
         }
+    
+        // Email validation
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError("Invalid email format");
-            return false;
+            setEmailError("Please enter a valid email address");
+            isValid = false;
         }
-        return true;
+    
+        // Password validation
+        if (password.length < 8) {
+            setPasswordError("Password must be at least 8 characters");
+            isValid = false;
+        } else if (!/[A-Z]/.test(password)) {
+            setPasswordError("Password must contain at least one uppercase letter");
+            isValid = false;
+        } else if (!/[0-9]/.test(password)) {
+            setPasswordError("Password must contain at least one number");
+            isValid = false;
+        }
+    
+        // Confirm password validation
+        if (password !== confirmPassword) {
+            setPasswordError("Passwords do not match");
+            isValid = false;
+        }
+    
+        return isValid;
     };
-
+    
+    // Enhanced handleSubmit function
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Prevent submission if already loading
         if (loading) return;
         
         try {
             setLoading(true);
+            // Reset all error states
+            setUsernameError("");
+            setEmailError("");
+            setPasswordError("");
             setError("");
-
+    
             if (!validateForm()) {
                 setLoading(false);
                 return;
             }
-
+    
             const response = await api.post("/api/user/register/", {
                 username,
                 email,
                 password,
                 confirm_password: confirmPassword
             });
-
+    
             console.log('Registration response:', response);
-
+    
             if (response.status === 201) {
                 alert("Registration successful! Please login.");
                 navigate("/login");
                 return;
             }
-
+    
         } catch (error) {
             console.error("Registration error:", error.response);
             
-            let errorMessage = "";
-
-            // Check for specific error messages from backend
-            if (error.response?.data?.error) {
-                const errorText = error.response.data.error;
-                if (errorText.includes('username already exists')) {
-                    errorMessage = "Username already exists";
-                } else if (errorText.includes('email already exists')) {
-                    errorMessage = "Email already exists";
-                } else {
-                    errorMessage = errorText;
+            // Handle specific backend validations
+            const errorData = error.response?.data?.error;
+            
+            if (errorData) {
+                if (typeof errorData === 'string') {
+                    // Handle string error messages
+                    if (errorData.includes('username already exists')) {
+                        setUsernameError("This username is already taken");
+                    } else if (errorData.includes('email already exists')) {
+                        setEmailError("An account with this email already exists");
+                    } else {
+                        setError(errorData);
+                    }
+                } else if (typeof errorData === 'object') {
+                    // Handle object error messages
+                    if (errorData.username) setUsernameError(errorData.username[0]);
+                    if (errorData.email) setEmailError(errorData.email[0]);
+                    if (errorData.password) setPasswordError(errorData.password[0]);
                 }
             } else {
-                // Handle by status code if no specific message
+                // Handle HTTP status code errors
                 switch (error.response?.status) {
                     case 429:
-                        errorMessage = "Too many attempts. Please try again later";
+                        setError("Too many attempts. Please try again later");
                         break;
                     case 500:
-                        errorMessage = "Server error. Please try again later";
-                        break;
-                    case 400:
-                        errorMessage = "Invalid input. Please check your details.";
-                        break;
-                    case 409:
-                        errorMessage = "Username or email already exists";
+                        setError("Server error. Please try again later");
                         break;
                     default:
-                        errorMessage = "Registration failed. Please try again";
+                        setError("Registration failed. Please try again");
                 }
             }
-            
-            setError(errorMessage);
-            
         } finally {
             setLoading(false);
         }
