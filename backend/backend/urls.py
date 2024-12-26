@@ -5,7 +5,6 @@ from api.views import CreateUserView, CustomTokenObtainPairView  # Add CustomTok
 
 # JWT (JSON Web Token) authentication views
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,  # Handles login and token generation
     TokenRefreshView,     # Handles token refresh
 )
 
