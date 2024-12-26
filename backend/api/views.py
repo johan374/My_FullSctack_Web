@@ -119,6 +119,40 @@ class CreateUserView(generics.CreateAPIView):
    queryset = User.objects.all()  # Get all users
    serializer_class = UserSerializer  # Use UserSerializer for validation/serialization
    permission_classes = [AllowAny]  # Allow unauthenticated access
+<<<<<<< HEAD
+=======
+
+   def create(self, request, *args, **kwargs):
+       try:
+           # Attempt to create user
+           response = super().create(request, *args, **kwargs)
+           return Response(response.data, status=status.HTTP_201_CREATED)
+
+       except serializers.ValidationError as e:
+           # Handle validation errors
+           error_data = e.detail if hasattr(e, 'detail') else e.args[0]
+
+           if isinstance(error_data, dict):
+               # Check specific validation errors
+               if 'username' in error_data:
+                   return Response({"error": "Username already exists"}, 
+                                status=status.HTTP_409_CONFLICT)
+               if 'email' in error_data:
+                   return Response({"error": "Email already exists"}, 
+                                status=status.HTTP_409_CONFLICT)
+               if 'password' in error_data:
+                   return Response({"error": error_data['password'][0]}, 
+                                status=status.HTTP_400_BAD_REQUEST)
+
+           # Generic validation error
+           return Response({"error": str(error_data)}, 
+                         status=status.HTTP_400_BAD_REQUEST)
+
+       except Exception as e:
+           # Handle unexpected errors
+           return Response({"error": "Server error occurred"}, 
+                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+>>>>>>> 67fc3ad3fbee9e287231ba5d6ae2392525c69734
 
    def create(self, request, *args, **kwargs):
        try:
