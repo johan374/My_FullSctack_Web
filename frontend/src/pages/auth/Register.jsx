@@ -39,19 +39,6 @@ function Register() {
         return true;   
     };
 
-     // Handle backend error responses
-     if (error.response?.data?.error?.includes('username already exists')) {
-        setError("Username already exists");
-        return false;
-    }
-    if (error.response?.data?.error?.includes('email already exists')) {
-        setError("Email already exists"); 
-        return false;
-    } else {
-        switch (error.response?.status) {
-            // ... rest of your cases
-        }
-    }
 
     // Get the navigate function for redirecting users
     const navigate = useNavigate();
@@ -86,6 +73,20 @@ function Register() {
         } catch (error) {
             // Log full error response for debugging
             console.error("Registration error:", error.response);
+
+             // Handle backend error responses
+            if (error.response?.data?.error?.includes('username already exists')) {
+                setError("Username already exists");
+                return false;
+            }
+            if (error.response?.data?.error?.includes('email already exists')) {
+                setError("Email already exists"); 
+                return false;
+            } else {
+                switch (error.response?.status) {
+                    // ... rest of your cases
+                }
+            }
             
             // Initialize error message variable
             let errorMessage;
