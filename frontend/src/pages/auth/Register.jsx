@@ -102,17 +102,15 @@ function Register() {
             console.error("Error status:", error.response?.status);
             
             if (error.response) {
-                // The request was made and the server responded with a status code
                 const errorData = error.response.data;
-                
                 console.log("Detailed error data:", errorData);
         
-                // Check for specific error scenarios
+                // More flexible error handling
                 if (errorData.error) {
-                    if (errorData.error.includes('username already exists')) {
-                        setUsernameError("This username is already taken");
-                    } else if (errorData.error.includes('email already exists')) {
-                        setEmailError("An account with this email already exists");
+                    if (errorData.error.toLowerCase().includes('username')) {
+                        setUsernameError(errorData.details ? errorData.details[0] : "Username already exists");
+                    } else if (errorData.error.toLowerCase().includes('email')) {
+                        setEmailError(errorData.details ? errorData.details[0] : "Email already exists");
                     } else {
                         setError(errorData.error);
                     }
@@ -130,8 +128,8 @@ function Register() {
         } finally {
             setLoading(false);
         }
-    
     };
+    
     return (
         <form onSubmit={handleSubmit} className="form-container">
             <h1>Register</h1>
