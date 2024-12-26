@@ -15,6 +15,9 @@ function Register() {
     const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const [usernameError, setUsernameError] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
 
     const validateForm = () => {
         // Reset all error states
@@ -138,8 +141,9 @@ function Register() {
 
             {error && <div className="error-message">{error}</div>}
             
+            {/* Username input - remains the same */}
             <input
-                className="form-input"
+                className={`form-input ${usernameError ? 'border-red-500' : ''}`}
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -147,19 +151,23 @@ function Register() {
                 required
                 minLength={3}
             />
-    
+            {usernameError && <div className="text-red-500 text-sm mt-1">{usernameError}</div>}
+
+            {/* Email input - remains the same */}
             <input
-                className="form-input"
+                className={`form-input ${emailError ? 'border-red-500' : ''}`}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
             />
-    
+            {emailError && <div className="text-red-500 text-sm mt-1">{emailError}</div>}
+
+            {/* Password input container */}
             <div className="password-input-container ml-8">
                 <input
-                    className="form-input"
+                    className={`form-input ${passwordError ? 'border-red-500' : ''}`}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -180,16 +188,19 @@ function Register() {
                     }
                 </button>
             </div>
+            {passwordError && <div className="text-red-500 text-sm mt-1">{passwordError}</div>}
 
+            {/* Confirm Password input container - added error styling */}
             <div className="password-input-container ml-8">
                 <input
-                    className="form-input"
+                    className={`form-input ${passwordError ? 'border-red-500' : ''}`}
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password"
                     required
                     disabled={loading}
+                    minLength={8}
                 />
                 <button
                     type="button"
@@ -204,16 +215,7 @@ function Register() {
                 </button>
             </div>
 
-            {loading && <LoadingIndicator />}
-            
-            <button
-                className="form-button"
-                type="submit"
-                disabled={loading || !username || !email || !password || !confirmPassword}
-            >
-                {loading ? "Loading..." : "Register"}
-            </button>
-
+            {/* Terms and Privacy Policy section */}
             <div className="flex items-center justify-center gap-2 mb-3">
                 <input 
                     type="checkbox" 
@@ -241,7 +243,19 @@ function Register() {
                     </Link>
                 </label>
             </div>
+
+            {/* Loading indicator and submit button */}
+            {loading && <LoadingIndicator />}
+            
+            <button
+                className="form-button"
+                type="submit"
+                disabled={loading || !username || !email || !password || !confirmPassword}
+            >
+                {loading ? "Loading..." : "Register"}
+            </button>
     
+            {/* Login link */}
             <div className="form-footer">
                 Already have an account? <Link to="/login">Login here</Link>
             </div>
