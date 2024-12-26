@@ -48,20 +48,28 @@ function Login() {
                 setError("Invalid response from server");
             }
     
-        } catch (error) {
-            console.error("Login error details:", {
-                status: error.response?.status,
-                data: error.response?.data
-            });
+        }  catch (error) {
+            console.error("Login error:", error.response);
             
-            setError(
-                error.response?.data?.error || 
-                error.response?.data?.detail || 
-                "Invalid credentials. Please try again."
-            );
-        } finally {
+            let errorMessage;
+            switch (error.response?.status) {
+                case 429:
+                    errorMessage = "Too many attempts. Please try again later";
+                    break;
+                case 500:
+                    errorMessage = "Server error. Please try again later";
+                    break;
+                case 401:
+                case 403:
+                    errorMessage = "Invalid credentials. Please try again";
+                    break;
+                default:
+                    errorMessage = "Login failed. Please try again";
+            }
+            setError(errorMessage);
+         } finally {
             setLoading(false);
-        }
+         }
     };
 
     return (
@@ -137,3 +145,12 @@ function Login() {
 }
 
 export default Login;
+
+/*case 200: // Success
+case 201: // Created successfully
+case 400: // Bad request - validation failed
+case 401: // Unauthorized - invalid credentials
+case 403: // Forbidden - lack permissions
+case 404: // Not found
+case 429: // Too many requests - rate limit
+case 500: // Server error*/ 

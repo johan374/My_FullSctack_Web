@@ -59,26 +59,40 @@ function Register() {
             }
     
         } catch (error) {
-            console.error("Registration error details:", {
-                status: error.response?.status,
-                data: error.response?.data
-            });
+            // Log full error response for debugging
+            console.error("Registration error:", error.response);
             
+            // Initialize error message variable
             let errorMessage;
-            if (error.response?.data) {
-                if (typeof error.response.data === 'string') {
-                    errorMessage = error.response.data;
-                } else if (typeof error.response.data === 'object') {
-                    // Handle case where error data is an object with multiple fields
-                    errorMessage = Object.entries(error.response.data)
-                        .map(([key, value]) => `${key}: ${Array.isArray(value) ? value[0] : value}`)
-                        .join('\n');
-                }
+         
+            // Check error status code and set appropriate message
+            switch (error.response?.status) {
+                case 429: 
+                    // Rate limit exceeded
+                    errorMessage = "Too many attempts. Please try again later";
+                    break;
+                case 500:
+                    // Server-side error
+                    errorMessage = "Server error. Please try again later";
+                    break;
+                case 400:
+                    // Validation/bad request error
+                    errorMessage = "Invalid input. Please check your details.";
+                    break;
+                case 409:
+                    // Conflict - duplicate resource
+                    errorMessage = "Username or email already exists";
+                    break;
+                default:
+                    // Generic error for unknown cases
+                    errorMessage = "Registration failed. Please try again";
             }
-            setError(errorMessage || "Registration failed. Please try again.");
-        } finally {
+            // Set error state to display to user
+            setError(errorMessage);
+         } finally {
+            // Always reset loading state
             setLoading(false);
-        }
+         }
     };
 
     return (
