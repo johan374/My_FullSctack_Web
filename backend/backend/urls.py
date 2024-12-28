@@ -23,7 +23,29 @@ def api_root(request):
             "auth": "/api/token/",               # Authentication endpoint
             "payments": "/api/payments/config/",  # Payment configuration endpoint
             "register": "api/user/register/",     # User registration endpoint
-            'login': "api/token/"                # Login endpoint (same as auth)
+            'login': "api/token/",                # Login endpoint (same as auth)
+            "password_reset": {                   # Password reset endpoints
+                "request": "api/password/request-reset/",    # Request reset code
+                "verify": "api/password/verify-reset/"       # Verify code and reset password
+            }
+        },
+        "documentation": {
+            "password_reset": {
+                "request": {
+                    "method": "POST",
+                    "body": {"email": "user@example.com"},
+                    "response": {"message": "If an account exists with this email, you will receive a reset code."}
+                },
+                "verify": {
+                    "method": "POST",
+                    "body": {
+                        "email": "user@example.com",
+                        "code": "123456",
+                        "new_password": "newpassword123"
+                    },
+                    "response": {"message": "Password reset successful"}
+                }
+            }
         }
     })
 

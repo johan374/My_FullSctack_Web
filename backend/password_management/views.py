@@ -7,10 +7,9 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+from django.utils import timezone
+from .models import PasswordResetCode
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -37,44 +36,42 @@ class PasswordResetRequestView(APIView):
             user = User.objects.filter(email=email).first()
             
             if user:
-                # Generate reset token and URL
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                reset_url = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}"
+                # Generate reset code
+                reset_code = PasswordResetCode.create_for_user(user)
                 
-                # Log the reset URL for debugging (remove in production)
-                logger.info(f"Password reset URL generated: {reset_url}")
+                # Log the reset code for debugging (remove in production)
+                logger.info(f"Password reset code generated for user: {user.username}")
                 
                 context = {
                     'user': user,
-                    'reset_url': reset_url
+                    'reset_code': reset_code.code
                 }
                 
-                email_html = render_to_string('password_management/reset_email.html', context)
+                email_html = render_to_string('password_management/reset_email_code.html', context)
                 
                 try:
                     send_mail(
-                        subject='Password Reset Request',
-                        message='Please click the link to reset your password',
+                        subject='Your Password Reset Code',
+                        message=f'Your password reset code is: {reset_code.code}',
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         recipient_list=[email],
                         html_message=email_html,
                         fail_silently=False,
                     )
-                    logger.info(f"Password reset email sent successfully to {email}")
+                    logger.info(f"Password reset code sent successfully to {email}")
                 except Exception as e:
                     logger.error(f"Failed to send password reset email: {str(e)}")
                     return Response(
                         {
                             'error': 'Failed to send email',
-                            'detail': 'There was an error sending the password reset email. Please try again later.'
+                            'detail': 'There was an error sending the reset code. Please try again later.'
                         },
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
             
             # Don't reveal if the email exists
             return Response({
-                'message': 'If an account exists with this email, you will receive password reset instructions.'
+                'message': 'If an account exists with this email, you will receive a reset code.'
             })
             
         except Exception as e:
@@ -87,62 +84,68 @@ class PasswordResetRequestView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-class PasswordResetConfirmView(APIView):
+class PasswordResetVerifyView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
     
-    def post(self, request, uidb64, token):
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        new_password = request.data.get('new_password')
+
+        if not all([email, code, new_password]):
+            return Response(
+                {
+                    'error': 'Missing required fields',
+                    'detail': 'Email, code and new password are required.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            # Log the received reset attempt
-            logger.info(f"Password reset confirmation attempt - UID: {uidb64}")
-            
-            # Decode the user ID
-            try:
-                uid = force_str(urlsafe_base64_decode(uidb64))
-                user = User.objects.get(pk=uid)
-            except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
-                logger.error(f"Invalid user ID in password reset: {str(e)}")
+            user = User.objects.filter(email=email).first()
+            if not user:
                 return Response(
                     {
-                        'error': 'Invalid reset link',
-                        'detail': 'The password reset link is invalid or has expired. Please request a new one.'
+                        'error': 'Invalid reset code',
+                        'detail': 'The reset code is invalid or has expired.'
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
-            # Verify the token
-            if not default_token_generator.check_token(user, token):
-                logger.warning(f"Invalid or expired token used for user {uid}")
+
+            # Find valid reset code
+            reset_code = PasswordResetCode.objects.filter(
+                user=user,
+                code=code,
+                used=False,
+                expires_at__gt=timezone.now()
+            ).first()
+
+            if not reset_code:
+                logger.warning(f"Invalid or expired reset code attempt for email: {email}")
                 return Response(
                     {
-                        'error': 'Invalid or expired token',
-                        'detail': 'This password reset link has expired. Please request a new one.'
+                        'error': 'Invalid reset code',
+                        'detail': 'The reset code is invalid or has expired. Please request a new one.'
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
-            # Get and validate new password
-            new_password = request.data.get('new_password')
-            if not new_password:
-                return Response(
-                    {
-                        'error': 'Password required',
-                        'detail': 'Please provide a new password.'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
+
             # Set new password
             user.set_password(new_password)
             user.save()
-            logger.info(f"Password successfully reset for user {uid}")
-            
+
+            # Mark code as used
+            reset_code.used = True
+            reset_code.save()
+
+            logger.info(f"Password successfully reset for user {user.username}")
             return Response({
                 'message': 'Password reset successful. You can now log in with your new password.'
             })
-            
+
         except Exception as e:
-            logger.error(f"Unexpected error in password reset confirmation: {str(e)}")
+            logger.error(f"Password reset verification error: {str(e)}")
             return Response(
                 {
                     'error': 'Server error',
