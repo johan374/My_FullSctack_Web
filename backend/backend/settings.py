@@ -243,4 +243,4 @@ EMAIL_HOST_PASSWORD = 'xjsv xeyd uffk ahxr' #important
 DEFAULT_FROM_EMAIL = 'robloxmapa@gmail.com'
 
 # Frontend URL for password reset
-FRONTEND_URL = 'http://localhost:5173'  # Adjust to your frontend URL
+FRONTEND_URL = 'https://my-fullsctack-web-frontend.onrender.com'  # Adjust to your frontend URL
