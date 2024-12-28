@@ -339,7 +339,11 @@ function Register() {
                 }
             </div>
     
-            {loading && <LoadingIndicator />}
+            {loading && (
+                <div className="flex justify-center items-center">
+                    <LoadingIndicator />
+                </div>
+            )}
             
             <button
                 className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 
