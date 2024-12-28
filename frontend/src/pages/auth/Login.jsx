@@ -48,36 +48,28 @@ function Login() {
                 setError("Invalid response from server");
             }
     
-        }  catch (error) {
-            console.error("Login error:", error.response);
+        } catch (error) {
+            console.error("Login error details:", {
+                status: error.response?.status,
+                data: error.response?.data
+            });
             
-            let errorMessage;
-            switch (error.response?.status) {
-                case 429:
-                    errorMessage = "Too many attempts. Please try again later";
-                    break;
-                case 500:
-                    errorMessage = "Server error. Please try again later";
-                    break;
-                case 401:
-                case 403:
-                    errorMessage = "Invalid credentials. Please try again";
-                    break;
-                default:
-                    errorMessage = "Login failed. Please try again";
-            }
-            setError(errorMessage);
-         } finally {
+            setError(
+                error.response?.data?.error || 
+                error.response?.data?.detail || 
+                "Invalid credentials. Please try again."
+            );
+        } finally {
             setLoading(false);
-         }
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className="form-container">
-            <h1>Login</h1>
+            <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h1>
             
             {error && (
-                <div className="error-message">
+                <div className="p-3 mb-4 text-sm text-red-500 bg-red-100 rounded-md" role="alert">
                     {error}
                 </div>
             )}
@@ -145,12 +137,3 @@ function Login() {
 }
 
 export default Login;
-
-/*case 200: // Success
-case 201: // Created successfully
-case 400: // Bad request - validation failed
-case 401: // Unauthorized - invalid credentials
-case 403: // Forbidden - lack permissions
-case 404: // Not found
-case 429: // Too many requests - rate limit
-case 500: // Server error*/ 

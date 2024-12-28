@@ -1,6 +1,6 @@
 // Import React's useState hook for managing component state
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 // Import necessary routing components from react-router-dom:
 // - Link: For navigation between pages
 // - useParams: To access URL parameters
@@ -132,21 +132,18 @@ export function ResetPassword() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [hasError, setHasError] = useState(false);
     const { uid, token } = useParams();
     const navigate = useNavigate();
 
-    const validatePassword = (password) => {
-        // Creating an array of validation rules
+    const validatePassword = (password, confirmPwd) => {
         const validations = [
-            {
-                test: password === confirmPassword,
-                message: "Passwords do not match"
-            },
             {
                 test: password.length >= 8,
                 message: "Password must be at least 8 characters long"
             },
-            // .test(password) checks if the password contains any character matching that pattern
             {
                 test: /[A-Z]/.test(password),
                 message: "Password must contain at least one uppercase letter"
@@ -159,6 +156,10 @@ export function ResetPassword() {
                 test: /[0-9]/.test(password),
                 message: "Password must contain at least one number"
             },
+            {
+                test: confirmPwd === '' || password === confirmPwd,
+                message: "Passwords do not match"
+            }
         ];
 
         // Find first failed validation
@@ -166,20 +167,28 @@ export function ResetPassword() {
         // v => !v.test is a function that returns true when a validation test is false (failed)
         // failedValidation will contain the first failed validation object, or undefined if all passed
         const failedValidation = validations.find(v => !v.test);
-        
         if (failedValidation) {
             setMessage(failedValidation.message);
+            setHasError(true);
             return false;
         }
         
+        setMessage('');
+        setHasError(false);
         return true;
     };
+
+    //useEffect for Real-time validation
+    useEffect(() => {
+        if (newPassword || confirmPassword) {
+            validatePassword(newPassword, confirmPassword);
+        }
+    }, [newPassword, confirmPassword]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Validate password before proceeding
-        if (!validatePassword(newPassword)) {
+        if (!validatePassword(newPassword, confirmPassword)) {
             return;
         }
 
@@ -192,9 +201,11 @@ export function ResetPassword() {
                 { new_password: newPassword }
             );
             setMessage(response.data.message);
+            setHasError(false);
             setTimeout(() => navigate('/login'), 3000);
         } catch (error) {
             setMessage(error.response?.data?.error || 'An error occurred');
+            setHasError(true);
         } finally {
             setLoading(false);
         }
@@ -204,52 +215,71 @@ export function ResetPassword() {
         <form onSubmit={handleSubmit} className="form-container">
             <h1>Set New Password</h1>
             
-            {/* Password requirements display */}
-            <div className="password-requirements">
-                <p>Password must contain:</p>
-                <ul>
-                    <li>At least 8 characters</li>
-                    <li>One uppercase letter (A-Z)</li>
-                    <li>One lowercase letter (a-z)</li>
-                    <li>One number (0-9)</li>
-                    <li>One special character (!@#$%^&*)</li>
-                </ul>
+            <div className="password-input-container">
+                <input
+                    className={`form-input ${hasError ? 'border-red-500' : ''}`}
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New Password"
+                    required
+                    minLength={8}
+                    aria-label="New Password"
+                    autoComplete="new-password"
+                />
+                <button
+                    type="button"
+                    className="password-toggle-button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    disabled={loading}
+                    aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                >
+                    {showNewPassword ? 
+                        <EyeOff className="eye-icon" size={20} /> : 
+                        <Eye className="eye-icon" size={20} />
+                    }
+                </button>
             </div>
-    
-            <input
-                className="form-input"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="New Password"
-                required
-                minLength={8}
-                aria-label="New Password"
-                autoComplete="new-password"
-            />
-    
-            <input
-                className="form-input"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm Password"
-                required
-                minLength={8}
-                aria-label="Confirm Password"
-                autoComplete="new-password"
-            />
-    
+
+            <div className="password-input-container">
+                <input
+                    className={`form-input ${hasError ? 'border-red-500' : ''}`}
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm Password"
+                    required
+                    minLength={8}
+                    aria-label="Confirm Password"
+                    autoComplete="new-password"
+                />
+                <button
+                    type="button"
+                    className="password-toggle-button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={loading}
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                    {showConfirmPassword ? 
+                        <EyeOff className="eye-icon" size={20} /> : 
+                        <Eye className="eye-icon" size={20} />
+                    }
+                </button>
+            </div>
+
             {message && (
-                <div className="message-box" role="alert">
+                <div 
+                    className={`message-box ${hasError ? 'error' : 'success'}`} 
+                    role="alert"
+                >
                     {message}
                 </div>
             )}
-    
+
             <button
                 className="form-button"
                 type="submit"
-                disabled={loading}
+                disabled={loading || hasError}
             >
                 {loading ? "Resetting..." : "Reset Password"}
             </button>
