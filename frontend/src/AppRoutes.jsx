@@ -70,7 +70,12 @@ const AppRoutes = () => {
       />
 
       <Route path='/forgot-password' element={<ForgotPassword />} />
-      <Route path='/reset-password/:uid/:token' element={<ResetPassword />} />
+      <Route 
+        path='/reset-password/:uid/:token' 
+        element={<ResetPassword />}
+        // Add this comment to clarify the route's purpose
+        // Handles password reset URLs with format: /reset-password/{base64_user_id}/{reset_token}
+      />
 
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
