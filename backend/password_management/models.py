@@ -21,8 +21,8 @@ class PasswordResetCode(models.Model):
     @classmethod
     def create_for_user(cls, user):
         """Create a new reset code for a user"""
-        # Delete any existing unused codes
-        cls.objects.filter(user=user, used=False).delete()
+        # Cleanup old attempts (older than 30 minutes)
+        cls.cleanup_old_attempts(user)
         
         # Generate new code
         code = cls.generate_code()
@@ -34,3 +34,13 @@ class PasswordResetCode(models.Model):
             code=code,
             expires_at=expires_at
         )
+
+    @classmethod
+    def cleanup_old_attempts(cls, user):
+        """Clean up attempts older than 30 minutes"""
+        thirty_mins_ago = timezone.now() - timezone.timedelta(minutes=30)
+        cls.objects.filter(
+            user=user,
+            created_at__lt=thirty_mins_ago,
+            used=False
+        ).delete()
