@@ -5,14 +5,33 @@ import os
 
 load_dotenv()
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+# Ensure DEBUG is properly set based on environment
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+# You might want to update your ALLOWED_HOSTS based on environment
+if not DEBUG:
+    ALLOWED_HOSTS = [
+        'my-fullsctack-web.onrender.com',
+        'my-fullsctack-web-frontend.onrender.com',
+    ]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+
+
 # Add these to your existing settings
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 SIMPLE_JWT = {
@@ -289,25 +308,6 @@ PASSWORD_HASHERS = [
    'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # PBKDF2 with SHA256
    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',  # PBKDF2 with SHA1
 ]
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-# Ensure DEBUG is properly set based on environment
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-
-# You might want to update your ALLOWED_HOSTS based on environment
-if not DEBUG:
-    ALLOWED_HOSTS = [
-        'my-fullsctack-web.onrender.com',
-        'my-fullsctack-web-frontend.onrender.com',
-    ]
-else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 #new code
 # REST_FRAMEWORK settings - controls Django REST Framework behavior
