@@ -130,14 +130,11 @@ load_dotenv()
 
 # Database configuration using environment variables
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # Supabase uses 'postgres' as default database name
-        'USER': 'postgres',  # Supabase uses 'postgres' as default user
-        'PASSWORD': os.getenv('DB_PASSWORD'),  # Your Supabase database password
-        'HOST': 'db.ntauiigvixgvqlhdcvtq.supabase.co',  # Your Supabase host
-        'PORT': '5432',  # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
