@@ -2,6 +2,7 @@ from pathlib import Path #new importsss
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+import dj_database_url  # Added
 
 load_dotenv()
 
