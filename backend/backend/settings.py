@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     # Third-party libraries for added functionality
     "rest_framework",                # Django REST Framework for building and managing APIs.
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",                   # Middleware to handle Cross-Origin Resource Sharing (CORS) policies.
 ]
 
